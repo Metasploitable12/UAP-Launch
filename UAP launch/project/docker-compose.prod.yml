@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  syncron-security-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - HMAC_SECRET=${HMAC_SECRET}
+      - PORT=3001
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60000}
+      - RATE_LIMIT_MAX=${RATE_LIMIT_MAX:-10}
+      - SESSION_TIMEOUT=${SESSION_TIMEOUT:-600000}
+      - LOG_LEVEL=${LOG_LEVEL:-warn}
+    volumes:
+      - app-logs:/app/logs
+    restart: always
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      - syncron-security-app
+    restart: always
+    networks:
+      - app-network
+
+volumes:
+  app-logs:
+    driver: local
+  nginx-cache:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
+    name: syncron-security-prod

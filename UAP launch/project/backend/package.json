@@ -1,0 +1,42 @@
+{
+  "name": "syncron-security-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Syncron Security Awareness Month",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "build:prod": "tsc && npm run obfuscate",
+    "build:debug": "tsc --sourceMap",
+    "obfuscate": "javascript-obfuscator dist --output dist --options-preset high-obfuscation",
+    "start": "node dist/index.js",
+    "start:prod": "NODE_ENV=production node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/uuid": "^9.0.7",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3",
+    "ts-node-dev": "^2.0.0",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.8",
+    "ts-jest": "^29.1.1",
+    "javascript-obfuscator": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
